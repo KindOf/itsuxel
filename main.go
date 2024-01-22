@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-    "github.com/swaggo/echo-swagger"
+	"github.com/swaggo/echo-swagger"
 
+	"github.com/KindOf/itsuxel/api"
 	_ "github.com/KindOf/itsuxel/docs"
 )
 
@@ -35,39 +35,26 @@ func NewLogger() echo.MiddlewareFunc {
 	})
 }
 
-// @title ITSUXEL
-// @version 1.0
-// @description Educational Excel-like API
+//	@title			ITSUXEL
+//	@version		1.0
+//	@description	Educational Excel-like API
 
-// @contact.email iostapovychweb@gmail.com
+//	@contact.email	iostapovychweb@gmail.com
 
-// @host localhost:3000
-// @BasePath /api/v1
+//	@host		localhost:3000
+//	@BasePath	/api/v1
 func main() {
-    // USE EXPR https://expr-lang.org/
+	// USE EXPR https://expr-lang.org/
 	e := echo.New()
 	// Root level middleware
 	e.Use(NewLogger())
 	e.Use(middleware.Recover())
 
-	e.POST("/api/v1/table/:sheet/:cell", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
-	})
+	e.POST("/api/v1/table/:sheet/:cell", api.CreateCell)
 
-	e.GET("/api/v1/table/:sheet/:cell", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
-	})
+	e.GET("/api/v1/table/:sheet/:cell", api.GetCell)
 
-	e.GET("/api/v1/table/:sheet", func(c echo.Context) error {
-		tr := []*ValueResponse{
-			NewValueResponse("value1", "cell1"),
-			NewValueResponse("value2", "cell2"),
-			NewValueResponse("value3", "cell3"),
-			NewValueResponse("value4", "cell4"),
-		}
-
-		return c.JSON(http.StatusOK, tr)
-	})
+	e.GET("/api/v1/table/:sheet", api.GetSheet)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.Logger.Fatal(e.Start("localhost:3000"))
