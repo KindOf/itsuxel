@@ -6,5 +6,29 @@ info:
   description: Educational Excel-like API
   title: ITSUXEL
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/table/{sheet}/{cell}:
+    post:
+      consumes:
+      - application/json
+      description: Add a new pet to the store
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      - description: cell address
+        in: path
+        name: cell
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: adds value to cell
 swagger: "2.0"
