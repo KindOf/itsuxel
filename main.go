@@ -11,17 +11,6 @@ import (
 	_ "github.com/KindOf/itsuxel/docs"
 )
 
-type ValueResponse struct {
-	Value  string `json:"value"`
-	Result string `json:"result"`
-}
-
-func NewValueResponse(value string, result string) *ValueResponse {
-	return &ValueResponse{value, result}
-}
-
-type TableResponse = []ValueResponse
-
 func NewLogger() echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogMethod: true,
