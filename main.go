@@ -6,6 +6,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+    "github.com/swaggo/echo-swagger"
+
+	_ "github.com/KindOf/itsuxel/docs"
 )
 
 type ValueResponse struct {
@@ -32,6 +35,14 @@ func NewLogger() echo.MiddlewareFunc {
 	})
 }
 
+// @title ITSUXEL
+// @version 1.0
+// @description Educational Excel-like API
+
+// @contact.email iostapovychweb@gmail.com
+
+// @host localhost:3000
+// @BasePath /api/v1
 func main() {
     // USE EXPR https://expr-lang.org/
 	e := echo.New()
@@ -58,8 +69,6 @@ func main() {
 		return c.JSON(http.StatusOK, tr)
 	})
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.Logger.Fatal(e.Start("localhost:3000"))
 }

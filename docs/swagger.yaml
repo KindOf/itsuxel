@@ -1,0 +1,10 @@
+basePath: /v1
+host: localhost:3000
+info:
+  contact:
+    email: iostapovychweb@gmail.com
+  description: Educational Excel-like API
+  title: ITSUXEL
+  version: "1.0"
+paths: {}
+swagger: "2.0"

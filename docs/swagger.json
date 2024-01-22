@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Educational Excel-like API",
+        "title": "ITSUXEL",
+        "contact": {
+            "email": "iostapovychweb@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/v1",
+    "paths": {}
+}
