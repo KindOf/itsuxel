@@ -1,4 +1,12 @@
 basePath: /api/v1
+definitions:
+  api.ValueResponse:
+    properties:
+      result:
+        type: string
+      value:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -7,7 +15,49 @@ info:
   title: ITSUXEL
   version: "1.0"
 paths:
-  /api/v1/table/{sheet}/{cell}:
+  /table/{sheet}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            items:
+              $ref: '#/definitions/api.ValueResponse'
+            type: array
+      summary: returns cell value
+  /table/{sheet}/{cell}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: sheet name
+        in: path
+        name: sheet
+        required: true
+        type: string
+      - description: cell address
+        in: path
+        name: cell
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/api.ValueResponse'
+      summary: returns cell value
     post:
       consumes:
       - application/json
@@ -29,6 +79,6 @@ paths:
         "200":
           description: ok
           schema:
-            type: string
+            $ref: '#/definitions/api.ValueResponse'
       summary: adds value to cell
 swagger: "2.0"

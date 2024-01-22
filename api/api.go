@@ -21,18 +21,37 @@ func NewValueResponse(value string, result string) *ValueResponse {
 //	@Description	Add a new pet to the store
 //	@Accept			json
 //	@Produce		json
-//	@Param			sheet	path		string	true	"sheet name"
-//	@Param			cell	path		string	true	"cell address"
-//	@Success		200		{string}	string	"ok"
-//	@Router			/api/v1/table/{sheet}/{cell} [post]
+//	@Param			sheet	path		string			true	"sheet name"
+//	@Param			cell	path		string			true	"cell address"
+//	@Success		200		{object}	ValueResponse	"ok"
+//	@Router			/table/{sheet}/{cell} [post]
 func CreateCell(c echo.Context) error {
 	return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
 }
 
+// GetCell returns cell value
+//
+//	@Summary	returns cell value
+//	@Accept		json
+//	@Produce	json
+//	@Param		sheet	path		string			true	"sheet name"
+//	@Param		cell	path		string			true	"cell address"
+//	@Success	200		{object}	ValueResponse	"ok"
+//
+//	@Router		/table/{sheet}/{cell} [get]
 func GetCell(c echo.Context) error {
 	return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
 }
 
+// GetSheet returns sheet cells
+//
+//	@Summary	returns cell value
+//	@Accept		json
+//	@Produce	json
+//	@Param		sheet	path		string			true	"sheet name"
+//	@Success	200		{object}	[]ValueResponse	"ok"
+//
+//	@Router		/table/{sheet} [get]
 func GetSheet(c echo.Context) error {
 	tr := []*ValueResponse{
 		NewValueResponse("value1", "cell1"),

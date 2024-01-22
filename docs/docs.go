@@ -17,7 +17,71 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/table/{sheet}/{cell}": {
+        "/table/{sheet}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "returns cell value",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "sheet",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.ValueResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/table/{sheet}/{cell}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "returns cell value",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "sheet",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "cell address",
+                        "name": "cell",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/api.ValueResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Add a new pet to the store",
                 "consumes": [
@@ -47,9 +111,22 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/api.ValueResponse"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.ValueResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }
