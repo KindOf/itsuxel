@@ -16,19 +16,19 @@ type (
 		Result string `json:"result"`
 	}
 
-	SetCellValueParam struct {
+	CellAddr struct {
 		Sheet string `json:"sheet" param:"sheet" validate:"required"`
 		Cell  string `json:"cell" param:"cell" validate:"required"`
 	}
 
-	SetCellValueBody struct {
+	CellValue struct {
 		Value string `json:"value" validate:"required"`
 	}
 
-    SetCellValue struct {
-        SetCellValueParam
-        SetCellValueBody
-    }
+	SetCellValue struct {
+		CellAddr
+		CellValue
+	}
 )
 
 func NewValueResponse(value string, result string) *ValueResponse {
@@ -83,7 +83,25 @@ func CreateCell(c echo.Context) error {
 //
 //	@Router		/table/{sheet}/{cell} [get]
 func GetCell(c echo.Context) error {
-	return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
+	lock.Lock()
+	defer lock.Unlock()
+
+    addr := &CellAddr{}
+
+    if err := c.Bind(addr); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+    if err := c.Validate(addr); err != nil {
+        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+    }
+
+	val, err := data.GetCell(addr.Sheet, addr.Cell)
+    if err != nil {
+        return echo.NewHTTPError(http.StatusNotFound, "Not Found")
+    }
+
+	return c.JSON(http.StatusOK, NewValueResponse(val, val))
 }
 
 // GetSheet returns sheet cells

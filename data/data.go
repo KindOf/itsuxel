@@ -8,39 +8,52 @@ import (
 )
 
 var (
-    RedisClient *redis.Client
+	RedisClient *redis.Client
 )
 
 func ConnectStorage() {
-    RedisClient = redis.NewClient(&redis.Options{
-        Addr: ":6379",
-    })
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr: ":6379",
+	})
 }
 
 func SetCell(sheet, cell, value string) error {
-    ctx := context.Background()
-    s := RedisClient.HSet(ctx, sheet, cell, value)
+	ctx := context.Background()
+	s := RedisClient.HSet(ctx, sheet, cell, value)
 
-    if isExp(value) {
-        fmt.Println("Value is expression")
-    }
+	if isExp(value) {
+		fmt.Println("Value is expression")
+	}
 
-    if err := s.Err(); err != nil {
-        return err
-    }
+	if err := s.Err(); err != nil {
+		return err
+	}
 
-    fmt.Println(s.Val())
-    return nil
+	fmt.Println(s.Val())
+	return nil
 }
 
-func GetCell(sheet, cell string) {
-//    ctx := context.Background()
+func GetCell(sheet, cell string) (string, error) {
+	ctx := context.Background()
+
+	cmd := RedisClient.HGet(ctx, sheet, cell)
+
+	val, err := cmd.Result()
+	if err != nil {
+		return "", err
+	}
+
+	if isExp(val) {
+		fmt.Println("Value is expression")
+	}
+
+	return val, nil
 }
 
 func GetSheet(sheet string) {
-    //res := RedisClient.HGetAll(ctx, sheet)
+	//res := RedisClient.HGetAll(ctx, sheet)
 }
 
 func isExp(val string) bool {
-    return string(val[0]) == "="
+	return string(val[0]) == "="
 }
