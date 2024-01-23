@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  api.SetCellValueBody:
+    properties:
+      value:
+        type: string
+    required:
+    - value
+    type: object
   api.ValueResponse:
     properties:
       result:
@@ -73,12 +80,18 @@ paths:
         name: cell
         required: true
         type: string
+      - description: Set Cell Value
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/api.SetCellValueBody'
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: ok
           schema:
-            $ref: '#/definitions/api.ValueResponse'
+            type: string
       summary: adds value to cell
 swagger: "2.0"

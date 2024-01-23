@@ -2,14 +2,34 @@ package api
 
 import (
 	"net/http"
+	"sync"
 
+	"github.com/KindOf/itsuxel/data"
 	"github.com/labstack/echo/v4"
 )
 
-type ValueResponse struct {
-	Value  string `json:"value"`
-	Result string `json:"result"`
-}
+var lock = sync.Mutex{}
+
+type (
+	ValueResponse struct {
+		Value  string `json:"value"`
+		Result string `json:"result"`
+	}
+
+	SetCellValueParam struct {
+		Sheet string `json:"sheet" param:"sheet" validate:"required"`
+		Cell  string `json:"cell" param:"cell" validate:"required"`
+	}
+
+	SetCellValueBody struct {
+		Value string `json:"value" validate:"required"`
+	}
+
+    SetCellValue struct {
+        SetCellValueParam
+        SetCellValueBody
+    }
+)
 
 func NewValueResponse(value string, result string) *ValueResponse {
 	return &ValueResponse{value, result}
@@ -23,10 +43,33 @@ func NewValueResponse(value string, result string) *ValueResponse {
 //	@Produce		json
 //	@Param			sheet	path		string			true	"sheet name"
 //	@Param			cell	path		string			true	"cell address"
-//	@Success		200		{object}	ValueResponse	"ok"
+//	@Param			json	body		SetCellValueBody	true	"Set Cell Value"
+//	@Success		201		{object}	string			"ok"
 //	@Router			/table/{sheet}/{cell} [post]
 func CreateCell(c echo.Context) error {
-	return c.JSON(http.StatusOK, NewValueResponse("value", "cell"))
+	lock.Lock()
+	defer lock.Unlock()
+
+	cell := &SetCellValue{}
+
+	if err := c.Bind(cell); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := c.Validate(cell); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	err := data.SetCell(cell.Sheet, cell.Cell, cell.Value)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	err = c.String(http.StatusCreated, "ok")
+	if err != nil {
+		return nil
+	}
+	return nil
 }
 
 // GetCell returns cell value

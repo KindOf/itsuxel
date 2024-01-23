@@ -105,13 +105,22 @@ const docTemplate = `{
                         "name": "cell",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Set Cell Value",
+                        "name": "json",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SetCellValueBody"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/api.ValueResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -119,6 +128,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.SetCellValueBody": {
+            "type": "object",
+            "required": [
+                "value"
+            ],
+            "properties": {
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ValueResponse": {
             "type": "object",
             "properties": {
