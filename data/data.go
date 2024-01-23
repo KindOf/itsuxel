@@ -50,8 +50,17 @@ func GetCell(sheet, cell string) (string, error) {
 	return val, nil
 }
 
-func GetSheet(sheet string) {
-	//res := RedisClient.HGetAll(ctx, sheet)
+func GetSheet(sheet string) (map[string]string, error) {
+	ctx := context.Background()
+
+	cmd := RedisClient.HGetAll(ctx, sheet)
+
+    m, err := cmd.Result()
+    if err != nil {
+        return map[string]string{}, err
+    }
+
+    return m, nil
 }
 
 func isExp(val string) bool {

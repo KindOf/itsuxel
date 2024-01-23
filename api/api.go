@@ -11,14 +11,17 @@ import (
 var lock = sync.Mutex{}
 
 type (
-	ValueResponse struct {
-		Value  string `json:"value"`
-		Result string `json:"result"`
+	SheetParam struct {
+		Sheet string `json:"sheet" param:"sheet" validate:"required"`
+	}
+
+	CellParam struct {
+		Cell string `json:"cell" param:"cell" validate:"required"`
 	}
 
 	CellAddr struct {
-		Sheet string `json:"sheet" param:"sheet" validate:"required"`
-		Cell  string `json:"cell" param:"cell" validate:"required"`
+		SheetParam
+		CellParam
 	}
 
 	CellValue struct {
@@ -29,10 +32,22 @@ type (
 		CellAddr
 		CellValue
 	}
+
+	ValueResponse struct {
+		CellAddr
+		Value  string `json:"value"`
+		Result string `json:"result"`
+	}
+
+	HTTPError struct {
+		Code     int         `json:"-"`
+		Message  interface{} `json:"message"`
+		Internal error       `json:"-"`
+	}
 )
 
-func NewValueResponse(value string, result string) *ValueResponse {
-	return &ValueResponse{value, result}
+func NewValueResponse(addr *CellAddr, value string, result string) *ValueResponse {
+	return &ValueResponse{*addr, value, result}
 }
 
 // CreateCell adds value to cell
@@ -41,10 +56,11 @@ func NewValueResponse(value string, result string) *ValueResponse {
 //	@Description	Add a new pet to the store
 //	@Accept			json
 //	@Produce		json
-//	@Param			sheet	path		string			true	"sheet name"
-//	@Param			cell	path		string			true	"cell address"
-//	@Param			json	body		SetCellValueBody	true	"Set Cell Value"
-//	@Success		201		{object}	string			"ok"
+//	@Param			sheet	path		string		true	"sheet name"
+//	@Param			cell	path		string		true	"cell address"
+//	@Param			json	body		CellValue	true	"Set Cell Value"
+//	@Success		201		{object}	string		"ok"
+//	@Failure		400		{object}	HTTPError
 //	@Router			/table/{sheet}/{cell} [post]
 func CreateCell(c echo.Context) error {
 	lock.Lock()
@@ -80,28 +96,29 @@ func CreateCell(c echo.Context) error {
 //	@Param		sheet	path		string			true	"sheet name"
 //	@Param		cell	path		string			true	"cell address"
 //	@Success	200		{object}	ValueResponse	"ok"
-//
+//	@Failure	400		{object}	HTTPError
+//	@Failure	404		{object}	HTTPError
 //	@Router		/table/{sheet}/{cell} [get]
 func GetCell(c echo.Context) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-    addr := &CellAddr{}
+	addr := &CellAddr{}
 
-    if err := c.Bind(addr); err != nil {
+	if err := c.Bind(addr); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-    }
+	}
 
-    if err := c.Validate(addr); err != nil {
-        return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-    }
+	if err := c.Validate(addr); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
 
 	val, err := data.GetCell(addr.Sheet, addr.Cell)
-    if err != nil {
-        return echo.NewHTTPError(http.StatusNotFound, "Not Found")
-    }
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Not Found")
+	}
 
-	return c.JSON(http.StatusOK, NewValueResponse(val, val))
+	return c.JSON(http.StatusOK, NewValueResponse(addr, val, val))
 }
 
 // GetSheet returns sheet cells
@@ -111,14 +128,32 @@ func GetCell(c echo.Context) error {
 //	@Produce	json
 //	@Param		sheet	path		string			true	"sheet name"
 //	@Success	200		{object}	[]ValueResponse	"ok"
-//
+//	@Failure	404		{object}	HTTPError
+//	@Failure	400		{object}	HTTPError
 //	@Router		/table/{sheet} [get]
 func GetSheet(c echo.Context) error {
-	tr := []*ValueResponse{
-		NewValueResponse("value1", "cell1"),
-		NewValueResponse("value2", "cell2"),
-		NewValueResponse("value3", "cell3"),
-		NewValueResponse("value4", "cell4"),
+	lock.Lock()
+	defer lock.Unlock()
+
+	addr := &SheetParam{}
+
+	if err := c.Bind(addr); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := c.Validate(addr); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	m, err := data.GetSheet(addr.Sheet)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	tr := []*ValueResponse{}
+
+	for k, v := range m {
+		tr = append(tr, NewValueResponse(&CellAddr{SheetParam{addr.Sheet}, CellParam{k}}, v, v))
 	}
 
 	return c.JSON(http.StatusOK, tr)
