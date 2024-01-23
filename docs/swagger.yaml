@@ -1,18 +1,29 @@
 basePath: /api/v1
 definitions:
-  api.SetCellValueBody:
+  api.CellValue:
     properties:
       value:
         type: string
     required:
     - value
     type: object
+  api.HTTPError:
+    properties:
+      message: {}
+    type: object
   api.ValueResponse:
     properties:
+      cell:
+        type: string
       result:
+        type: string
+      sheet:
         type: string
       value:
         type: string
+    required:
+    - cell
+    - sheet
     type: object
 host: localhost:3000
 info:
@@ -41,6 +52,14 @@ paths:
             items:
               $ref: '#/definitions/api.ValueResponse'
             type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
       summary: returns cell value
   /table/{sheet}/{cell}:
     get:
@@ -64,6 +83,14 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/api.ValueResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.HTTPError'
       summary: returns cell value
     post:
       consumes:
@@ -85,7 +112,7 @@ paths:
         name: json
         required: true
         schema:
-          $ref: '#/definitions/api.SetCellValueBody'
+          $ref: '#/definitions/api.CellValue'
       produces:
       - application/json
       responses:
@@ -93,5 +120,9 @@ paths:
           description: ok
           schema:
             type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.HTTPError'
       summary: adds value to cell
 swagger: "2.0"

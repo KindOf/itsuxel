@@ -44,6 +44,18 @@ const docTemplate = `{
                                 "$ref": "#/definitions/api.ValueResponse"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
                     }
                 }
             }
@@ -79,6 +91,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/api.ValueResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
                     }
                 }
             },
@@ -112,7 +136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.SetCellValueBody"
+                            "$ref": "#/definitions/api.CellValue"
                         }
                     }
                 ],
@@ -122,13 +146,19 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.HTTPError"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "api.SetCellValueBody": {
+        "api.CellValue": {
             "type": "object",
             "required": [
                 "value"
@@ -139,10 +169,26 @@ const docTemplate = `{
                 }
             }
         },
-        "api.ValueResponse": {
+        "api.HTTPError": {
             "type": "object",
             "properties": {
+                "message": {}
+            }
+        },
+        "api.ValueResponse": {
+            "type": "object",
+            "required": [
+                "cell",
+                "sheet"
+            ],
+            "properties": {
+                "cell": {
+                    "type": "string"
+                },
                 "result": {
+                    "type": "string"
+                },
+                "sheet": {
                     "type": "string"
                 },
                 "value": {
