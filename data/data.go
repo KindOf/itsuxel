@@ -16,7 +16,7 @@ var (
 
 func ConnectStorage() {
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr: ":6379",
+		Addr: "redis:6379",
 	})
 }
 
