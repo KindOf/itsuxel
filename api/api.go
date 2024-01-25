@@ -6,6 +6,7 @@ import (
 
 	"github.com/KindOf/itsuxel/data"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 var lock = sync.Mutex{}
@@ -36,17 +37,13 @@ type (
 	ValueResponse struct {
 		CellAddr
 		Value  string `json:"value"`
-		Result string `json:"result"`
+		Result any `json:"result"`
 	}
 
-	HTTPError struct {
-		Code     int         `json:"-"`
-		Message  interface{} `json:"message"`
-		Internal error       `json:"-"`
-	}
+	HTTPError = echo.HTTPError
 )
 
-func NewValueResponse(addr *CellAddr, value string, result string) *ValueResponse {
+func NewValueResponse(addr *CellAddr, value string, result any) *ValueResponse {
 	return &ValueResponse{*addr, value, result}
 }
 
@@ -113,17 +110,18 @@ func GetCell(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	val, err := data.GetCell(addr.Sheet, addr.Cell)
+	cellValue, err := data.GetCell(addr.Sheet, addr.Cell)
 	if err != nil {
+        log.Error(err)
 		return echo.NewHTTPError(http.StatusNotFound, "Not Found")
 	}
 
-	return c.JSON(http.StatusOK, NewValueResponse(addr, val, val))
+	return c.JSON(http.StatusOK, NewValueResponse(addr, cellValue.Value, cellValue.Result))
 }
 
 // GetSheet returns sheet cells
 //
-//	@Summary	returns cell value
+//	@Summary	returns sheet cells
 //	@Accept		json
 //	@Produce	json
 //	@Param		sheet	path		string			true	"sheet name"
@@ -153,7 +151,7 @@ func GetSheet(c echo.Context) error {
 	tr := []*ValueResponse{}
 
 	for k, v := range m {
-		tr = append(tr, NewValueResponse(&CellAddr{SheetParam{addr.Sheet}, CellParam{k}}, v, v))
+		tr = append(tr, NewValueResponse(&CellAddr{SheetParam{addr.Sheet}, CellParam{k}}, v.Value, v.Result))
 	}
 
 	return c.JSON(http.StatusOK, tr)

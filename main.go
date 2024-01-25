@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-    "net/http"
+	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -52,7 +52,7 @@ func main() {
 	// USE EXPR https://expr-lang.org/
 	data.ConnectStorage()
 	e := echo.New()
-    e.Validator = &CustomValidator{validator: validator.New()}
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Root level middleware
 	e.Use(NewLogger())
@@ -65,5 +65,5 @@ func main() {
 	e.GET("/api/v1/table/:sheet", api.GetSheet)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	e.Logger.Fatal(e.Start("localhost:3000"))
+	e.Logger.Fatal(e.Start(":3000"))
 }

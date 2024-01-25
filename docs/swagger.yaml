@@ -15,8 +15,7 @@ definitions:
     properties:
       cell:
         type: string
-      result:
-        type: string
+      result: {}
       sheet:
         type: string
       value:
@@ -60,7 +59,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api.HTTPError'
-      summary: returns cell value
+      summary: returns sheet cells
   /table/{sheet}/{cell}:
     get:
       consumes:

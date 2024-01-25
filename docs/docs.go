@@ -25,7 +25,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "returns cell value",
+                "summary": "returns sheet cells",
                 "parameters": [
                     {
                         "type": "string",
@@ -185,9 +185,7 @@ const docTemplate = `{
                 "cell": {
                     "type": "string"
                 },
-                "result": {
-                    "type": "string"
-                },
+                "result": {},
                 "sheet": {
                     "type": "string"
                 },

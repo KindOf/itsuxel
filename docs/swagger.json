@@ -19,7 +19,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "returns cell value",
+                "summary": "returns sheet cells",
                 "parameters": [
                     {
                         "type": "string",
@@ -179,9 +179,7 @@
                 "cell": {
                     "type": "string"
                 },
-                "result": {
-                    "type": "string"
-                },
+                "result": {},
                 "sheet": {
                     "type": "string"
                 },
